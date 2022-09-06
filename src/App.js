@@ -2,38 +2,51 @@ import {
   useMetamask,
   useDisconnect,
   useAddress,
-  useSignatureDrop,
-  useNFTDrop,
-  useContractMetadata,
-  useClaimedNFTSupply,
-  useNFT,
-  useNFTs,
+  useNFTCollection,
+  useContract,
+  useMintNFT,
 } from "@thirdweb-dev/react";
 
-import NFTList from "./NFTList";
-import { version } from "chai";
+import standard from "./NFTBooking.jpg";
 
 export default function Home() {
   const connectWithMetamask = useMetamask();
   const disconnectWallet = useDisconnect();
   const address = useAddress();
+  const contractAddress = "0x1eAFd10657d9dB71EB5663eF3942b1C0ec62E966";
+  const nftCollection = useNFTCollection(contractAddress);
+  const { contract } = useContract(contractAddress);
 
-  const contractAddress = "0xEed79CEf952584822EDbEe7732c25032Ea3714af";
-  const contractMetadata = useContractMetadata(contractAddress);
-  const contract = useNFTDrop(contractAddress);
+  const { mutate: mintNft, isLoading, error } = useMintNFT(nftCollection);
 
-  if (!contractMetadata) {
+  if (isLoading) {
     return <div>LOADING</div>;
   }
 
-  const mint = async () => {
-    try {
-      await contract?.claim(1);
-      alert("mint succesfuly");
-    } catch (error) {
-      alert("ERROR!");
-    }
-  };
+  if (error) {
+    console.error("failed to mint nft", error);
+  }
+
+  const mint = (
+    <div>
+      <img src={standard} />
+      <button
+        disabled={isLoading}
+        onClick={() =>
+          mintNft({
+            metadata: {
+              name: "NFTBooking Standard Lounge Collection",
+              image: standard,
+              description: "Standard Lounge Collection",
+            },
+            to: address,
+          })
+        }
+      >
+        Mint!
+      </button>
+    </div>
+  );
 
   return (
     <div>
@@ -41,12 +54,11 @@ export default function Home() {
         <div>
           <h4>Connected as {address}</h4>
           <button onClick={disconnectWallet}>Disconnect Metamask Wallet</button>
-          <button onClick={() => mint()}>Mint NFT</button>
         </div>
       ) : (
         <button onClick={connectWithMetamask}>Connect Metamask Wallet</button>
       )}
-      <NFTList />
+      {mint}
     </div>
   );
 }
