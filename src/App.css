@@ -1,0 +1,16 @@
+div {
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+button {
+    margin: 10rem;
+    background-color: grey;
+    color: white;
+    border-radius: 10px;
+}
