@@ -5,19 +5,62 @@ import {
   useNFTCollection,
   useContract,
   useMintNFT,
+  useEditionDrop,
+  useClaimNFT,
 } from "@thirdweb-dev/react";
 
 import standard from "./NFTBooking.jpg";
+import silver from "./2.jpg";
+import gold from "./3.jpg";
 
 export default function Home() {
   const connectWithMetamask = useMetamask();
   const disconnectWallet = useDisconnect();
   const address = useAddress();
-  const contractAddress = "0x1eAFd10657d9dB71EB5663eF3942b1C0ec62E966";
-  const nftCollection = useNFTCollection(contractAddress);
-  const { contract } = useContract(contractAddress);
+  const contractAddress = "0x050E86c51107dc696d2d73052BCE390C8034f04C";
+  const editionDrop = useEditionDrop(contractAddress);
 
-  const { mutate: mintNft, isLoading, error } = useMintNFT(nftCollection);
+  const { mutate: claimNft, isLoading, error } = useClaimNFT(editionDrop);
+
+  if (error) {
+    console.error("failed to claim nft", error);
+  }
+
+  const mint1 = (
+    <div>
+      {standard}
+      <button
+        disabled={isLoading}
+        onClick={() => claimNft({ to: address, quantity: 1, tokenId: 0 })}
+      >
+        Claim NFT!
+      </button>
+    </div>
+  );
+
+  const mint2 = (
+    <div>
+      {silver}
+      <button
+        disabled={isLoading}
+        onClick={() => claimNft({ to: address, quantity: 1, tokenId: 1 })}
+      >
+        Claim NFT!
+      </button>
+    </div>
+  );
+
+  const mint3 = (
+    <div>
+      {gold}
+      <button
+        disabled={isLoading}
+        onClick={() => claimNft({ to: address, quantity: 1, tokenId: 2 })}
+      >
+        Claim NFT!
+      </button>
+    </div>
+  );
 
   if (isLoading) {
     return <div>LOADING</div>;
@@ -26,27 +69,6 @@ export default function Home() {
   if (error) {
     console.error("failed to mint nft", error);
   }
-
-  const mint = (
-    <div>
-      <img src={standard} />
-      <button
-        disabled={isLoading}
-        onClick={() =>
-          mintNft({
-            metadata: {
-              name: "NFTBooking Standard Lounge Collection",
-              image: standard,
-              description: "Standard Lounge Collection",
-            },
-            to: address,
-          })
-        }
-      >
-        Mint!
-      </button>
-    </div>
-  );
 
   return (
     <div>
@@ -58,7 +80,9 @@ export default function Home() {
       ) : (
         <button onClick={connectWithMetamask}>Connect Metamask Wallet</button>
       )}
-      {mint}
+      {mint1}
+      {mint2}
+      {mint3}
     </div>
   );
 }

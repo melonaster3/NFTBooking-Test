@@ -7,6 +7,8 @@ import {
   useNFT,
 } from "@thirdweb-dev/react";
 
+import standardImage from "../public/NFTBooking.jpg";
+
 export default function Mint(props) {
   const contractAddress = "0xEed79CEf952584822EDbEe7732c25032Ea3714af";
   const nftDrop = useNFTDrop(contractAddress);
@@ -22,7 +24,7 @@ export default function Mint(props) {
       mintNft({
         name: "NFT Booking Lounge Collection",
         description: "Standard NFT Booking Lounge Collection",
-        image: "../public/NFTBooking.jpg",
+        image: { standardImage },
         to: props.address,
       });
       alert("Mint Succesful!");
@@ -33,7 +35,7 @@ export default function Mint(props) {
 
   return (
     <div>
-      <img src="../public/NFTBooking.jpg" />
+      <img src={standardImage} />
       <button disabled={isLoading} onClick={() => mintNFT()}>
         Mint!
       </button>
