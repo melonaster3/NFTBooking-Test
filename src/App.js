@@ -16,9 +16,7 @@ import {
 
 import "./App.css";
 
-import standard from "./NFTBooking.jpg";
-import gold from "./2.jpg";
-import silver from "./3.jpg";
+
 
 export default function Home() {
   const connectWithMetamask = useMetamask();
@@ -31,33 +29,49 @@ const { mutate: claimNft, isLoading, error } = useClaimNFT(editionDrop);
 const { data: ownedNFTs, isLoadingOwner, errorOwner } = useOwnedNFTs(editionDrop,address);
 const { data: totalCount, isLoadingTotalCount, errorTotalCount } = useTotalCount(editionDrop);
 
-
-
 if (isLoading || !nfts ) {
   return <div>LOADING</div>;
 }
 
-console.log(nfts);
-console.log(nfts[0].metadata.id.toNumber());
-console.log(totalCount.toNumber())
-console.log(ownedNFTs)
 
-const nftList = nfts.map((nft) => (
+let userOwnedNFTs = [];
+
+if(address && ownedNFTs) {
+  for (let i = 0; i < ownedNFTs.length; i ++) {
+    let nftInfo = {id : ownedNFTs[i].metadata.id.toNumber(), owned : ownedNFTs[i].quantityOwned.toNumber()}
+    userOwnedNFTs.push(nftInfo);
+  }
+}
+
+
+const nftList = nfts.map((nft) => {
+  
+  let userSupply = 0;
+  for (let ownedNft of userOwnedNFTs) {
+    if (ownedNft.id === nft.metadata.id.toNumber()) {
+      userSupply = ownedNft.owned;
+    }
+  }
+
+  
+  return (
   <div>
   <img
   src = {nft.metadata.image}
   width = "250px"
   length = "250px"
   />
+<h2>Claimed : {nft.supply.toNumber()} / 50</h2>
+<h3>User owned amount : {userSupply} </h3>
    <button
-     disabled={isLoading}
+     disabled={isLoading || nft.supply.toNumber() >= 50}
      onClick={() => claimNft({ to: address, quantity: 1, tokenId: nft.metadata.id.toNumber()})}
    >
      Claim NFT!
    </button>
  </div>
 
-))
+)})
 
 
   if (error) {
